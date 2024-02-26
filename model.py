@@ -10,15 +10,38 @@ pipe = pipeline('text-classification', model=model, tokenizer=tokenizer)
 def get_score(ai_pipe, message):
     return ai_pipe(message).__getitem__(0).get('score')
 
+class Score:
+
+    def __init__(self, score):
+        self.score = score
+    
+    def get_value(self):
+        return self.score
+
+    def __str__(self):
+        return str(self.get_value())
+    
+    def __repr(self):
+        return self.__str__()
+
+class BooleanScore(Score):
+
+    def __init__(self, score):
+        self.score = score
+    
+    def get_value(self):
+        return self.score > bias_threshold
+
+
 class Server:
     
     def __init__(self, pipeline : Pipeline):
         self.pipeline = pipeline
     
-    def process_sentence(self, sentence : str) -> bool:
-        return get_score(self.pipeline, sentence) > bias_threshold
+    def process_sentence(self, sentence : str) -> Score:
+        return Score(get_score(self.pipeline, sentence))
     
-    def process_sentences(self, sentences : list[str]) -> list[bool]:
+    def process_sentences(self, sentences : list[str]) -> list[Score]:
         length = len(sentences)
         results = [None] * length
         for i in range(0, length):
@@ -29,9 +52,9 @@ class Server:
 class Client:
     
     def split_into_sentences(self, text : str) -> list[str]:
-        return text.split('. ')
+        return text.split('.')
     
-    def process_text(self, text : str) -> list[bool]:
+    def process_text(self, text : str) -> list[Score]:
         return server.process_sentences(self.split_into_sentences(text))
     
     def render_text(self, text : str) -> None:
@@ -44,15 +67,16 @@ class Client:
         self.render_html(self.pull_html())
     
     def pull_html(self) -> str:
-        return "I'm going to rip off. My skin itches. There are ants under it."
+        return input("What is the paragraph you want to test?\n")
     
     def text_from_html(self, html : str) -> str:
         return html
     
-    def render_results(self, results : list[bool]) -> None:
+    def render_results(self, results : list[Score]) -> None:
         print(results)
 
 server = Server(pipe)
 client = Client()
 
-client.render()
+while True:
+    client.render()
