@@ -6,6 +6,7 @@ tokenizer = AutoTokenizer.from_pretrained("d4data/bias-detection-model")
 model = TFAutoModelForSequenceClassification.from_pretrained("d4data/bias-detection-model")
 
 pipe = pipeline('text-classification', model=model, tokenizer=tokenizer)
+debug = True
 
 def get_score(ai_pipe, message):
     return ai_pipe(message).__getitem__(0).get('score')
@@ -39,7 +40,8 @@ class Server:
         self.pipeline = pipeline
     
     def process_sentence(self, sentence : str) -> Score:
-        return Score(get_score(self.pipeline, sentence))
+        raw_score = get_score(self.pipeline, sentence)
+        return Score(raw_score) if debug else BooleanScore(raw_score)
     
     def process_sentences(self, sentences : list[str]) -> list[Score]:
         length = len(sentences)
@@ -52,7 +54,7 @@ class Server:
 class Client:
     
     def split_into_sentences(self, text : str) -> list[str]:
-        return text.split('.')
+        return text.replace('!', '.').replace('?', '.').split('.')
     
     def process_text(self, text : str) -> list[Score]:
         return server.process_sentences(self.split_into_sentences(text))
@@ -73,7 +75,15 @@ class Client:
         return html
     
     def render_results(self, results : list[Score]) -> None:
-        print(results)
+        print(results_to_string(results))
+
+def results_to_string(results : list[Score]) -> list[str]:
+    length = len(results)
+    str_results = [None] * length
+    for i in range(0, length):
+        str_results[i] = results[i].__str__()
+    
+    return str_results
 
 server = Server(pipe)
 client = Client()
