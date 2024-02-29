@@ -1,6 +1,10 @@
 from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
 from transformers import pipeline, Pipeline
 
+# desktop
+import tkinter as tk
+# desktop end
+
 bias_threshold = 0.8
 tokenizer = AutoTokenizer.from_pretrained("d4data/bias-detection-model")
 model = TFAutoModelForSequenceClassification.from_pretrained("d4data/bias-detection-model")
@@ -88,5 +92,24 @@ def results_to_string(results : list[Score]) -> list[str]:
 server = Server(pipe)
 client = Client()
 
-while True:
-    client.render()
+# desktop
+window=tk.Tk()
+window.title("BiasEd")
+window.geometry("600x400")
+
+label = tk.Label(window)
+label.pack()
+
+e = tk.Entry(window)
+e.pack()
+e.focus_set()
+
+def enter_text():
+    global e
+    string = e.get()
+    client.render_text(string)
+
+b = tk.Button(window, text='Submit', command=enter_text)
+b.pack(side='bottom')
+window.mainloop()
+# desktop end
