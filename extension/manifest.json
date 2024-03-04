@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "BiasEd",
+    "version": "1.0",
+    "description": "Recognizes bias online",
+    "permissions": [
+        "activeTab"
+    ],
+    "content_scripts": [
+        {
+          "js": ["content.js"],
+          "matches": [
+            "<all_urls>"
+          ]
+        }
+    ]
+}  
