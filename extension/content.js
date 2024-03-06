@@ -7,11 +7,10 @@ class TextSearch {
     }
 
     combineText(elements) {
-        for (let i = 0; i < collection.length; i++) {
-            print(elements[i].textContent);
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].textContent = "warden burger";
         }
     }
 
 }
-
-document.getElementsByTagName("*")
+new TextSearch().combineText(document.getElementsByTagName("*"))

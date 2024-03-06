@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
 from transformers import pipeline, Pipeline
 
 # desktop
-import tkinter as tk
+# import tkinter 
 # desktop end
 
 bias_threshold = 0.8
@@ -93,23 +93,23 @@ server = Server(pipe)
 client = Client()
 
 # desktop
-window=tk.Tk()
-window.title("BiasEd")
-window.geometry("600x400")
+# window=tk.Tk()
+# window.title("BiasEd")
+# window.geometry("600x400")
 
-label = tk.Label(window)
-label.pack()
+# label = tk.Label(window)
+# label.pack()
 
-e = tk.Entry(window)
-e.pack()
-e.focus_set()
+# e = tk.Entry(window)
+# e.pack()
+# e.focus_set()
 
-def enter_text():
-    global e
-    string = e.get()
-    client.render_text(string)
+# def enter_text():
+#     global e
+#     string = e.get()
+#     client.render_text(string)
 
-b = tk.Button(window, text='Submit', command=enter_text)
-b.pack(side='bottom')
-window.mainloop()
+# b = tk.Button(window, text='Submit', command=enter_text)
+# b.pack(side='bottom')
+# window.mainloop()
 # desktop end
