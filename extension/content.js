@@ -80,3 +80,11 @@ search = new TextSearch();
 search.combineText(document.getElementsByTagName("*"));
 search.discardExtranousSentences();
 search.debugDisplay(document.getElementsByTagName("*")[0]);
+
+$.ajax({
+    type: "POST",
+    url: "~/model.py",
+    data: { param: text}
+  }).done(function( o ) {
+     // do something
+  });
