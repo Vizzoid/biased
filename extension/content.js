@@ -1,14 +1,34 @@
 // available variables: document
 
+class TextElement {
+
+    constructor(element) {
+        this.element = element;
+        this.text = element.textContent;
+    }
+
+    trim() {
+        this.text = this.text.replaceAll("…", "").trim();
+    }
+
+    isInsignificant() {
+        return this.text == "" || this.text.length <= 10;
+    }
+
+    getString() {
+        return this.text;
+    }
+
+}
+
 class TextSearch {
 
     constructor() {
-        this.text = "";
+        this.texts = [];
     }
 
     combineText(elements) {
-        for (let i = 0; i < elements.length; i++) {
-            let element = elements[i];
+        for (const element of elements) {
             this.combineElement(element);
         }
     }
@@ -31,26 +51,28 @@ class TextSearch {
         if (element.textContent == null) {
             return;
         }
-        this.text = this.text + ". \n" + element.textContent;
+        this.texts.push(new TextElement(element));
     }
 
     discardExtranousSentences() {
-        let sentences = this.text.replaceAll("…", "").split('.');
-
-        var newText = "";
-        for (let i = 0; i < sentences.length; i++) {
-            let sentence = sentences[i].trim();
+        for (var i = this.texts.length - 1; i >= 0; i--) {
+            let text = this.texts[i];
+            text.trim();
             
-            if (sentence == "" || sentence.length <= 10) {
-                continue;
+            if (text.isInsignificant()) {
+                this.texts.splice(i, 1);
             }
-            newText = newText + sentence + ". ";
         }
-        this.text = newText;
     }
 
     debugDisplay(element) {
-        element.textContent = this.text;
+        var word = "";
+
+        for (const text of this.texts) {
+            word = word + text.getString() + " ";
+        }
+
+        element.textContent = word;
     }
 
 }
