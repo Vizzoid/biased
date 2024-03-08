@@ -6,6 +6,10 @@
     "permissions": [
         "activeTab"
     ],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+      "service_worker": "service-worker.js"
+    },  
     "content_scripts": [
         {
           "js": ["content.js"],

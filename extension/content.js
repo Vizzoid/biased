@@ -7,6 +7,11 @@ class TextElement {
         this.text = element.textContent;
     }
 
+    constructor(element, text) {
+        this.element = element;
+        this.text = text;
+    }
+
     trim() {
         this.text = this.text.replaceAll("…", "").trim();
     }
@@ -19,12 +24,20 @@ class TextElement {
         return this.text;
     }
 
+    setBias(bias) {
+        
+    }
+
 }
 
 class TextSearch {
 
     constructor() {
         this.texts = [];
+    }
+
+    getTexts() {
+        return this.texts;
     }
 
     combineText(elements) {
@@ -76,15 +89,16 @@ class TextSearch {
     }
 
 }
-search = new TextSearch();
-search.combineText(document.getElementsByTagName("*"));
-search.discardExtranousSentences();
-search.debugDisplay(document.getElementsByTagName("*")[0]);
+currentSearch = new TextSearch();
+currentSearch.combineText(document.getElementsByTagName("*"));
+currentSearch.discardExtranousSentences();
+currentSearch.debugDisplay(document.getElementsByTagName("*")[0]);
 
-$.ajax({
-    type: "POST",
-    url: "~/model.py",
-    data: { param: text}
-  }).done(function( o ) {
-     // do something
-  });
+var port = chrome.runtime.connect({name: "sentenceconnection"});
+port.postMessage({search: currentSearch});
+port.onMessage.addListener(function(msg) {
+    if (msg.question === "Who's there?")
+        port.postMessage({answer: "Madame"});
+    else if (msg.question === "Madame who?")
+        port.postMessage({answer: "Madame... Bovary"});
+});
