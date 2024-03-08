@@ -1,6 +1,13 @@
 from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
 from transformers import pipeline, Pipeline
 
+# web server
+import json
+import logging
+import re
+from http.server import BaseHTTPRequestHandler, HTTPServer
+# web server end
+
 # desktop
 # import tkinter 
 # desktop end
@@ -91,6 +98,36 @@ def results_to_string(results : list[Score]) -> list[str]:
 
 server = Server(pipe)
 client = Client()
+
+# web server
+class HTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if re.search('/api/ai/*', self.path):
+            sentence = self.path.split('/')[-1]
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+
+            data = json.dumps(client.process_text(sentence)).encode('utf-8')
+            logging.info("get record %s: %s", sentence, data)
+            self.wfile.write(data)
+
+        else:
+            self.send_response(403)
+        self.end_headers()
+
+        
+if __name__ == '__main__':
+    # run server
+    server = HTTPServer(('localhost', 8000), HTTPRequestHandler)
+    logging.info('Starting server...\n')
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    server.server_close()
+    logging.info('Stopping server...\n')
+# web server end
 
 # desktop
 # window=tk.Tk()

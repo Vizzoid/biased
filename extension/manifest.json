@@ -4,7 +4,8 @@
     "version": "1.0",
     "description": "Recognizes bias online",
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "storage"
     ],
     "host_permissions": ["<all_urls>"],
     "background": {

@@ -7,11 +7,6 @@ class TextElement {
         this.text = element.textContent;
     }
 
-    constructor(element, text) {
-        this.element = element;
-        this.text = text;
-    }
-
     trim() {
         this.text = this.text.replaceAll("…", "").trim();
     }
@@ -90,13 +85,30 @@ class TextSearch {
         element.textContent = word;
     }
 
+    setBiases(list_of_bias) {
+        for (let i = list_of_bias.length - 1; i >= 0; i--) {
+            // this.texts[i].setBias(list_of_bias[i]);
+            if (!list_of_bias[i]) {
+                this.texts.splice(i, 1);
+            }
+        }
+    }
+
 }
 currentSearch = new TextSearch();
 currentSearch.combineText(document.getElementsByTagName("*"));
 currentSearch.discardExtranousSentences();
 
+function stringSearch(search) {
+    list_of_strings = [];
+    for (const text of search.getTexts()) {
+        list_of_strings.push(text.getString());
+    }
+    return list_of_strings;
+}
 var port = chrome.runtime.connect({name: "sentenceconnection"});
-port.postMessage({search: currentSearch});
+port.postMessage({search: stringSearch(currentSearch)});
 port.onMessage.addListener(function(msg) {
-    msg.search.debugDisplay(document.getElementsByTagName("*")[0]);
+    currentSearch.setBiases(msg.search);
+    currentSearch.debugDisplay(document.getElementsByTagName("*")[0]);
 });
