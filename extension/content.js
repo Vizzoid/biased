@@ -25,7 +25,9 @@ class TextElement {
     }
 
     setBias(bias) {
-        
+        if (bias) {
+            // todo
+        }
     }
 
 }
@@ -92,13 +94,9 @@ class TextSearch {
 currentSearch = new TextSearch();
 currentSearch.combineText(document.getElementsByTagName("*"));
 currentSearch.discardExtranousSentences();
-currentSearch.debugDisplay(document.getElementsByTagName("*")[0]);
 
 var port = chrome.runtime.connect({name: "sentenceconnection"});
 port.postMessage({search: currentSearch});
 port.onMessage.addListener(function(msg) {
-    if (msg.question === "Who's there?")
-        port.postMessage({answer: "Madame"});
-    else if (msg.question === "Madame who?")
-        port.postMessage({answer: "Madame... Bovary"});
+    msg.search.debugDisplay(document.getElementsByTagName("*")[0]);
 });

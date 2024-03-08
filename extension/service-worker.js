@@ -1,5 +1,5 @@
 function processSentence(sentence) {
-    return true;
+    return true; // todo
 }
 
 // use content.js's TextSearch and TextElement classes for info on how to use the sent data
@@ -9,6 +9,6 @@ chrome.runtime.onConnect.addListener(function(port) {
         for (const text of msg.search.getTexts()) {
             text.setBias(processSentence(text.getString()));
         }
-        port.postMessage({response: msg.search});
+        port.postMessage({search: msg.search});
     });
 });  
