@@ -1,16 +1,4 @@
 function processSentence(sentence) {
-    // var xmlHttpRequest = (window.XMLHttpRequest) ? new window.XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-    // xmlHttpRequest.open("GET","http://localhost:8080/api/ai",true);
-    // xmlHttpRequest.send(sentence);
-    // xmlHttpRequest.onreadystatechange = function()
-    // {
-    //     if(xmlHttpRequest.readyState == XMLHttpRequest.DONE)
-    //     {
-    //         if (xhr.status === 200) {
-    //             result = xhr.responseText;
-    //         }
-    //     }
-    // }
     return true; // todo
 }
 
@@ -24,7 +12,19 @@ chrome.runtime.onConnect.addListener(function(port) {
         for (const text of msg.search) {
             list_of_biases.push(processSentence(text));
         }
-        port.postMessage({search: list_of_biases});
-        // posted message is list of booleans
+        var xmlHttpRequest = (window.XMLHttpRequest) ? new window.XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+        xmlHttpRequest.open("GET","http://localhost:8000/api/ai",true);
+        xmlHttpRequest.send(sentence);
+        xmlHttpRequest.onreadystatechange = function()
+        {
+            if(xmlHttpRequest.readyState == XMLHttpRequest.DONE)
+            {
+                if (xhr.status === 200)
+                {
+                    // posted message is list of booleans
+                    port.postMessage({search: xhr.responseText});
+                }
+            }
+        }
     });
 });  
