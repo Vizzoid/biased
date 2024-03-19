@@ -1,30 +1,59 @@
-function processSentence(sentence) {
-    return true; // todo
+// use content.js's TextSearch and TextElement classes for info on how to use the sent data
+
+/* here's the data diagram:
+
+For receiving JSON:
+{
+  "results": [
+    true,
+    false,
+    false,
+    true,
+    true,
+    false
+  ]
 }
 
-// use content.js's TextSearch and TextElement classes for info on how to use the sent data
+Assuming what is sent is equivalent to (using POST):
+{
+  "sentences": [
+    "biasedsentence1",
+    "unbiasedsentence2",
+    "unbiasedsentence3",
+    "biasedsentence4",
+    "biasedsentence5",
+    "unbiasedsentence6"
+  ]
+}
+
+*/
+// POST method implementation:
+async function postSentences(url = "", search) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify({ sentences: search}), // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name === "sentenceconnection");
 
     port.onMessage.addListener(function(msg) {
         // msg.search is a list of string texts for the original search
-        list_of_biases = [];
-        for (const text of msg.search) {
-            list_of_biases.push(processSentence(text));
-        }
-        var xmlHttpRequest = (window.XMLHttpRequest) ? new window.XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-        xmlHttpRequest.open("GET","http://localhost:8000/api/ai",true);
-        xmlHttpRequest.send(sentence);
-        xmlHttpRequest.onreadystatechange = function()
-        {
-            if(xmlHttpRequest.readyState == XMLHttpRequest.DONE)
-            {
-                if (xhr.status === 200)
-                {
-                    // posted message is list of booleans
-                    port.postMessage({search: xhr.responseText});
-                }
-            }
-        }
+        postSentences('https://refactored-system-9xr55j6qwqph9r46-8000.app.github.dev/api/ai', msg.search)
+            .then((response) => response.json())
+            .then((data) => port.postMessage({search: data.results}));
+            // posted message is list of booleans
     });
 });  

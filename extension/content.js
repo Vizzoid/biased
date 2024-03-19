@@ -107,8 +107,8 @@ function stringSearch(search) {
     return list_of_strings;
 }
 var port = chrome.runtime.connect({name: "sentenceconnection"});
-port.postMessage({search: stringSearch(currentSearch)});
 port.onMessage.addListener(function(msg) {
     currentSearch.setBiases(msg.search);
     currentSearch.debugDisplay(document.getElementsByTagName("*")[0]);
 });
+port.postMessage({search: stringSearch(currentSearch)});
