@@ -29,9 +29,9 @@ Assuming what is sent is equivalent to (using POST):
 */
 // POST method implementation:
 async function postSentences(url = "", search) {
-  // Default options are marked with *
-  const response = await fetch(url, {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
@@ -42,18 +42,24 @@ async function postSentences(url = "", search) {
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify({ sentences: search}), // body data type must match "Content-Type" header
-  });
-  return response.json(); // parses JSON response into native JavaScript objects
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
 }
 
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name === "sentenceconnection");
 
     port.onMessage.addListener(function(msg) {
+      try {
         // msg.search is a list of string texts for the original search
         postSentences('https://refactored-system-9xr55j6qwqph9r46-8000.app.github.dev/api/ai', msg.search)
-            .then((response) => response.json())
-            .then((data) => port.postMessage({search: data.results}));
+            .then((data) => port.postMessage({search: data.results}))
+            .catch((error) => {
+              console.log(error)
+            });
             // posted message is list of booleans
+      } catch (error) {
+        console.error("Error:", error);
+      }
     });
 });  
