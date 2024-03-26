@@ -6,6 +6,7 @@ import json
 import logging
 import re
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import cgi
 # web server end
 
 # desktop
@@ -100,33 +101,53 @@ server = Server(pipe)
 client = Client()
 
 # web server
-class HTTPRequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if re.search('/api/ai/*', self.path):
-            sentence = self.path.split('/')[-1]
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
+from flask import Flask, request, jsonify
 
-            data = json.dumps(client.process_text(sentence)).encode('utf-8')
-            logging.info("get record %s: %s", sentence, data)
-            self.wfile.write(data)
+app = Flask(__name__)
 
-        else:
-            self.send_response(403)
-        self.end_headers()
+@app.route('/api', methods=['POST'])
+def process_data():
+    data = request.json
+    print(data)
+    
+    # Extract sentences from the JSON data
+    sentences = data.get('sentences', [])
+    # Prepare the response
+    processed_data = {'status': 'success', 'results': server.process_sentences(sentences)}
+    # Return the processed data as JSON response
+    return jsonify(processed_data)  # Assuming JSON data is sent in the request
+
+if __name__ == '__main__':
+    app.run(debug=True)  # Run the Flask app
+# class HTTPRequestHandler(BaseHTTPRequestHandler):
+#     def do_POST(self):
+#         print("Received POST")
+#         self._set_headers()
+#         form = cgi.FieldStorage(
+#             fp=self.rfile,
+#             headers=self.headers,
+#             environ={'REQUEST_METHOD': 'POST'}
+#         )
+#         self.send_response(200)
+#         self.send_header('Content-Type', 'application/json')
+#         self.end_headers()
+
+#         sentences = form.getvalue("sentences")
+#         data = json.dumps(server.process_sentences(sentences)).encode('utf-8')
+#         logging.info("get record %s: %s", sentences, data)
+#         self.wfile.write(data)
 
         
-if __name__ == '__main__':
-    # run server
-    server = HTTPServer(('localhost', 8000), HTTPRequestHandler)
-    logging.info('Starting server...\n')
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    server.server_close()
-    logging.info('Stopping server...\n')
+# if __name__ == '__main__':
+#     # run server
+#     server = HTTPServer(('localhost', 8000), HTTPRequestHandler)
+#     logging.info('Starting server...\n')
+#     try:
+#         server.serve_forever()
+#     except KeyboardInterrupt:
+#         pass
+#     server.server_close()
+#     logging.info('Stopping server...\n')
 # web server end
 
 # desktop
